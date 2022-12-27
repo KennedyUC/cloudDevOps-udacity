@@ -17,7 +17,7 @@ Parameters:
   url:
     Type: String
     Description: Link to HTML to pull
-    Default: https://raw.githubusercontent.com/kennedyuc/project-repo/udagram-web.zip
+    Default: https://raw.githubusercontent.com/KennedyUC/cloudDevOps-udacity/main/cloudFormation/udagram-web.zip
 
 ######################################## Resources ###############################################################
 Resources:

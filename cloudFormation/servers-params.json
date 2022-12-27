@@ -13,6 +13,6 @@
     },
     {
         "ParameterKey": "url",
-        "ParameterValue": "https://raw.githubusercontent.com/kennedyuc/project-repo/udagram-web.zip"
+        "ParameterValue": "https://raw.githubusercontent.com/KennedyUC/cloudDevOps-udacity/main/cloudFormation/udagram-web.zip"
     }
 ]
