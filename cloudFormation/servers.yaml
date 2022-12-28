@@ -1,7 +1,5 @@
 Description: >
-  KenWeb template to deploy the servers and other resources for Udagram web application (Project 2).
-
-  Udagram Server Infrastructure
+  Template deploys the servers and other resources for Udagram web application
 
 ######################################### Parameters ############################################################
 Parameters:
@@ -14,28 +12,9 @@ Parameters:
   InstanceType:
     Description: EC2 instance type
     Type: String
-  url:
-    Type: String
-    Description: Link to HTML to pull
-    Default: https://raw.githubusercontent.com/KennedyUC/cloudDevOps-udacity/main/cloudFormation/udagram-web.zip
 
 ######################################## Resources ###############################################################
 Resources:
-  ##### Storage Bucket #####
-  WebAppStorageBucket:
-    Type: 'AWS::S3::Bucket'
-    DeletionPolicy: Retain
-    Properties:
-      BucketName: kennedy-udagram-bucket
-
-  ##### Deploy web app config files to S3 bucket #####
-  DeploymentCustomResource:
-    Type: Custom::deploytos3
-    Properties:
-      ServiceToken: !GetAtt deploytos3.Arn
-      url: !Ref url
-      bucketname: Ref WebAppStorageBucket
-  
   ##### Load Balancer Security Group #####
   LBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -53,6 +32,9 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-LB
 
   ##### Udagram App Servers Security Group #####
   WebServerSecurityGroup:
@@ -75,43 +57,9 @@ Resources:
           FromPort: 0
           ToPort: 65535
           CidrIp: 0.0.0.0/0
-
-  ##### EC2 servers IAM role #####
-  S3BucketsRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - ec2.amazonaws.com
-            Action:
-              - sts:AssumeRole
-      Path: "/"
-
-  ##### IAM Role Instance Profile #####
-  S3BucketsInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Path: "/"
-      Roles:
-        - Ref: S3BucketsRole
-
-  ##### S3 Bucket Policy #####
-  S3BucketsPolicy:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyName: S3BucketsPolicy
-      PolicyDocument:
-        Statement:
-          - Effect: Allow
-            Action:
-              - s3:*
-            Resource: "*"
-      Roles:
-        - Ref: S3BucketsRole
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-WebServer
 
   ##### Launch configuration that will be used when server will spin up #####
   WebAppLaunchConfig:
@@ -121,12 +69,15 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           apt-get update -y
-          apt-get install unzip awscli -y
+          apt-get install unzip -y
           apt-get install apache2 -y
-          systemctl start apache2.service
           cd /var/www/html
-          aws s3 cp s3://kennedy-udagram-bucket/udagram-web.zip .
-          unzip -o udagram-web.zip
+          wget https://raw.githubusercontent.com/KennedyUC/cloudDevOps-udacity/main/cloudFormation/udagram-web.zip
+          unzip udagram-web.zip
+          cp -r udagram-web/* /var/www/html/
+          rm -rf udagram-web udagram-web.zip
+          systemctl enable apache2.service
+          systemctl start apache2.service
       ImageId: !Ref ServerAMIId
       SecurityGroups:
         - Ref: WebServerSecurityGroup
@@ -135,6 +86,9 @@ Resources:
         - DeviceName: "/dev/sdk"
           Ebs:
             VolumeSize: "10"
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}
 
   ##### Udagram App Auto Scaling Group #####
   WebAppGroup:
@@ -148,6 +102,9 @@ Resources:
       MaxSize: "4"
       TargetGroupARNs:
         - Ref: WebAppTargetGroup
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}
 
   ##### Load balancer for public subnets with load balancer security group attached #####
   WebAppLB:
@@ -158,6 +115,9 @@ Resources:
         - Fn::ImportValue: !Sub "${EnvironmentName}-PUBLIC-SN02"
       SecurityGroups:
         - Ref: LBSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}
 
   ##### Load Balancer Listener #####
   Listener:
@@ -171,6 +131,9 @@ Resources:
         Ref: WebAppLB
       Port: "80"
       Protocol: HTTP
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-LB-1
 
   ##### Load Balancer Listner Rule #####
   ALBListenerRule:
@@ -184,6 +147,9 @@ Resources:
           Values: [/]
       ListenerArn: !Ref "Listener"
       Priority: 1
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-LB-2
 
   ##### Target Group #####
   WebAppTargetGroup:
@@ -200,6 +166,9 @@ Resources:
       VpcId:
         Fn::ImportValue:
           Fn::Sub: "${EnvironmentName}-VPCID"
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}
 
   ################################################## Outputs ###################################################
 Outputs:
