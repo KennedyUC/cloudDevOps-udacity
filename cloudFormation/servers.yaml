@@ -202,9 +202,9 @@ Resources:
           Fn::Sub: "${EnvironmentName}-VPCID"
 
   ################################################## Outputs ###################################################
-  Outputs:
-    WebAppLBDNSName:
-      Description: The website URL DNS name or Public URL of the Load Balancer.
-      Value: !Join ["", ["http://", !GetAtt WebAppLB.DNSName]]
-      Export:
-        Name: !Sub ${EnvironmentName}-LB-DNSName
+Outputs:
+  WebAppLBDNSName:
+    Description: The website URL DNS name or Public URL of the Load Balancer.
+    Value: !Join ["", ["http://", !GetAtt WebAppLB.DNSName]]
+    Export:
+      Name: !Sub ${EnvironmentName}-LB-DNSName
