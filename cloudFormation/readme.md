@@ -1,7 +1,7 @@
 ## Project 2: WebServer Deployment with CloudFormation  
   
 ## Infrastructure Diagram:  
-![infrastructure diagram](../images/udagram-iac-architecture.png)  
+![infrastructure diagram](./images/udagram-iac-architecture.png)  
   
 ## How to run the scripts:  
 The commands are defined in a `Makefile`.  
