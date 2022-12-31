@@ -41,3 +41,5 @@ To delete the server stack:
 ```  
 make delete_server  
 ```  
+  
+Load Balancer URL: http://udagr-webap-17tqu1a101tkf-939201576.us-east-1.elb.amazonaws.com

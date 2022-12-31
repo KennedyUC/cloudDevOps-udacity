@@ -1,7 +1,5 @@
 Description: >
-  Template deploys network infrastructure needed for Udagram web application.
-
-  Network Infrastructure for Udagram Web Application
+  Stack deploys network infrastructure needed for Udagram Web Application
 
 ########################################### Parameters ###############################################################
 Parameters:
@@ -52,9 +50,6 @@ Resources:
     Properties:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref VPC
-      Tags:
-        - Key: Name
-          Value: !Ref EnvironmentName
 
   PublicSubnet1:
     Type: AWS::EC2::Subnet
@@ -140,9 +135,6 @@ Resources:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref VPC
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName}-Public
 
   DefaultPublicRoute:
     Type: AWS::EC2::Route
@@ -151,27 +143,18 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName}-Public
 
   PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet1
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName}-Public-1
 
   PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet2
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName}-Public-2
 
   PrivateRouteTable1:
     Type: AWS::EC2::RouteTable
@@ -187,18 +170,12 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable1
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGateway1
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName}-Private-1
 
   PrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PrivateRouteTable1
       SubnetId: !Ref PrivateSubnet1
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName}-Private-1
 
   PrivateRouteTable2:
     Type: AWS::EC2::RouteTable
@@ -214,18 +191,12 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable2
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGateway2
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName}-Private-2
 
   PrivateSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PrivateRouteTable2
       SubnetId: !Ref PrivateSubnet2
-      Tags:
-        - Key: Name
-          Value: !Sub ${EnvironmentName}-Private-2
 
 ############################################# Outputs ###############################################################
 Outputs:
